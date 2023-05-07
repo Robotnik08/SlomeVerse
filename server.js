@@ -10,4 +10,3 @@ server.listen(port, () => {
     console.log(`listening on *:${port}`);
 });
 io = new Server(server);
-
