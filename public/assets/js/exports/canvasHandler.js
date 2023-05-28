@@ -22,6 +22,9 @@ export class Canvas {
         this.addToDocument = () => {
             document.body.appendChild(this.can);
         }
+        this.addToDocumentFront = () => {
+            document.body.insertBefore(this.can,document.body.firstChild);
+        }
         this.removeFromDocument = () => {
             this.can.remove();
         }
@@ -51,6 +54,12 @@ export class Canvas {
         }
         this.drawSprite = (sprite, position, size) => {
             this.ctx.drawImage(sprite.image,position.x,position.y,size.x,size.y);
+        }
+        this.setFont = (font, size) => {
+            this.ctx.font = `${size}px ${font}`;
+        }
+        this.drawText = (text, position) => {
+            this.ctx.fillText(text,position.x,position.y);
         }
         this.fixScale = () => {
             this.width = window.innerWidth;

@@ -10,6 +10,13 @@ html, body {
     overflow: hidden;
     margin: 0;
 }
+:not(body, html, canvas) {
+    position: absolute;
+    z-index: 9999;
+}
+:not(canvas, body, html, .has-inte) {
+    pointer-events:none;
+}
 body {
-    background-color: #000;
+    background-color: #FFF;
 }
