@@ -28,6 +28,9 @@ export class Canvas {
         this.removeFromDocument = () => {
             this.can.remove();
         }
+        this.setImageSmoothing = (bool) => {
+            this.ctx.imageSmoothingEnabled = bool;
+        }
         this.setColour = (colour) => {
             this.ctx.fillStyle = colour.toCssString();
         }
@@ -69,6 +72,9 @@ export class Canvas {
         };
         this.percentOfCan = (percentage) => {
             return new Vector2((this.width/100)*percentage, (this.height/100)*percentage);
+        }
+        this.subscribeEventListener = (event, func) => {
+            this.can.addEventListener(event, func);
         }
     }
 }
