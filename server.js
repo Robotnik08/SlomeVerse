@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
-const port = 80;
+const port = 2020;
 const { Server } = require("socket.io");
 let io = null;
 app.use(express.static('public'));

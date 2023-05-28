@@ -1,6 +1,6 @@
 {
-  "name": "chess",
-  "version": "0.0.6",
+  "name": "civ-game",
+  "version": "0.0.1",
   "description": "",
   "main": "server.js",
   "scripts": {

@@ -2,6 +2,7 @@ import { Vector2 } from "./vector.js";
 export class Canvas {
     constructor (size) {
         this.can = document.createElement("canvas");
+        this.scaleAuto = false;
         this.width = size.x;
         this.height = size.y;
         this.can.width = this.width;
@@ -48,8 +49,17 @@ export class Canvas {
         this.clearCanvas = () => {
             this.clearRect(new Vector2(0,0),new Vector2(this.can.width,this.can.height))
         }
-        this.drawSprite = (position, size, sprite) => {
+        this.drawSprite = (sprite, position, size) => {
             this.ctx.drawImage(sprite.image,position.x,position.y,size.x,size.y);
+        }
+        this.fixScale = () => {
+            this.width = window.innerWidth;
+            this.height = window.innerHeight;
+            this.can.width = this.width;
+            this.can.height = this.height;
+        };
+        this.percentOfCan = (percentage) => {
+            return new Vector2((this.width/100)*percentage, (this.height/100)*percentage);
         }
     }
 }
