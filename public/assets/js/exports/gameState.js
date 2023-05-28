@@ -3,7 +3,7 @@ import { Time } from "./update.js";
 import { KeyHandler } from "./keyHandler.js";
 import { Colour } from "./colour.js";
 import * as VECTOR from "./vector.js";
-import { getTileSprites } from "./gameSprites.js";
+import { SpriteManager } from "./gameSprites.js";
 import { Canvas } from "./canvasHandler.js";
 
 export class Game {
@@ -14,15 +14,17 @@ export class Game {
         const time = new Time();
         const keyHandler = new KeyHandler();
         const generator = new WorldGenerator(seed, smoothness, biomeSmoothness, frequency);
+        const textures = new SpriteManager();
         const can = new Canvas(new VECTOR.Vector2(1280,720));
-        const tileSprites = getTileSprites();
-        
+        const tileSprites = textures.getTileSprites();
+        const tileDataSprites = textures.getTileDataSprites();
+
         can.setImageSmoothing(false);
         can.addToDocumentFront();
         
         //world generation:
         this.world = generator.generateWorld(size);
-        this.worldTileData = {};
+        this.worldTileData = generator.populateWorld(this.world);
 
         //positional components:
         this.cameraPos = new VECTOR.Vector2(this.world.length/2,this.world[0].length/2);
@@ -81,7 +83,7 @@ export class Game {
             }
             for (let i = Math.max(0,((cameraPos.x-can.width/2/localTileSize.y)|0)-1); i < Math.min(this.world.length,((cameraPos.x+can.width/2/localTileSize.y)|0)+1); i++) {
                 for (let j = Math.max(0,((cameraPos.y-can.height/2/localTileSize.y)|0)-1); j < Math.min(this.world[i].length,((cameraPos.y+can.height/2/localTileSize.y)|0)+1); j++) {
-                    //overlayObjects
+                    if (this.checkIfMetaExist(new VECTOR.Vector2(i,j), "g")) can.drawSprite(tileDataSprites[this.getMetaData(new VECTOR.Vector2(i,j),"g")],new VECTOR.Vector2(i*localTileSize.y+centerOffset.x,j*localTileSize.y+centerOffset.y),new VECTOR.Vector2(localTileSize.y*1.04,localTileSize.y*1.04));
                 }
             }
             can.setColour(new Colour(255,255,255,0.4));
@@ -131,6 +133,10 @@ export class Game {
             if (this.worldTileData[pos] == null) this.worldTileData[pos] = {};
             this.worldTileData[pos][dataname] = data;
         }
+        this.getMetaData = (pos,dataname) => {
+            if (this.worldTileData[pos] == null) return null;
+            return this.worldTileData[pos][dataname];
+        }
         this.checkIfMetaExist = (pos,dataname) => {
             if (this.worldTileData[pos] == null) return false;
             return this.worldTileData[pos][dataname] != null;
@@ -145,6 +151,20 @@ export class WorldGenerator {
                 w[i] = [];
                 for (let j = 0; j < size.y; j++) {
                     w[i][j] = (getNoise(i*smoothness,j*smoothness,seed) > frequency+(8-getNoise(i*smoothness*0.1,j*smoothness*0.1,seed)*16)) ? 0 : this.getBiome(i,j);
+                }
+            }
+            return w;
+        }
+        this.populateWorld = (world) => {
+            const w = {};
+            for (let i = 0; i < world.length; i++) {
+                for (let j = 0; j < world[i].length; j++) {
+                    if (world[i][j] == 0) continue;
+                    if (getNoise(i*smoothness*0.5,j*smoothness*0.5,seed) > 0.73) {
+                        w[new VECTOR.Vector2(i,j)] = {
+                            g: 0
+                        }
+                    }
                 }
             }
             return w;
