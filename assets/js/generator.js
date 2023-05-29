@@ -1,15 +1,15 @@
 import { getNoise } from "./noise.js";
-import * as VECTOR from "./vector.js";
-import { RandomHandler } from "./random.js";
+import * as VECTOR from "../../public/assets/js/exports/vector.js";
+import { RandomHandler } from "../../public/assets/js/exports/random.js";
 
 export class WorldGenerator {
     constructor (config) {
         this.random = new RandomHandler();
-        this.generateWorld = (size) => {
+        this.generateWorld = () => {
             const w = [];
-            for (let i = 0; i < size.x; i++) {
+            for (let i = 0; i < config.mapSize.x; i++) {
                 w[i] = [];
-                for (let j = 0; j < size.y; j++) {
+                for (let j = 0; j < config.mapSize.y; j++) {
                     w[i][j] = (getNoise(i*config.smoothness,j*config.smoothness,config.seed) > config.frequency+(8-getNoise(i*config.smoothness*0.1,j*config.smoothness*0.1,config.seed)*16)) ? 0 : this.getBiome(i,j);
                 }
             }
@@ -17,8 +17,8 @@ export class WorldGenerator {
         }
         this.populateWorld = (world) => {
             const w = {};
-            for (let i = 0; i < world.length; i++) {
-                for (let j = 0; j < world[i].length; j++) {
+            for (let i = 0; i < config.mapSize.x; i++) {
+                for (let j = 0; j < config.mapSize.y; j++) {
                     if (world[i][j] == 0) continue;
                     const noiseValue = getNoise(i*config.smoothness*0.5,j*config.smoothness*0.5,config.seed);
                     if (noiseValue > 0.73) {

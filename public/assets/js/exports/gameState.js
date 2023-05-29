@@ -4,16 +4,15 @@ import { Colour } from "./colour.js";
 import * as VECTOR from "./vector.js";
 import { SpriteManager } from "./gameSprites.js";
 import { Canvas } from "./canvasHandler.js";
-import { WorldGenerator } from "./generator.js";
+import { Client } from "./clientHandler.js";
 
 export class Game {
-    constructor (config) {
+    constructor () {
         //instance of a game, including components and data
 
         //static components:
         const time = new Time();
         const keyHandler = new KeyHandler();
-        const generator = new WorldGenerator(config);
         const textures = new SpriteManager();
         const can = new Canvas(new VECTOR.Vector2(1280,720));
         const tileSprites = textures.getTileSprites();
@@ -23,11 +22,13 @@ export class Game {
         can.addToDocumentFront();
         
         //world generation:
-        this.world = generator.generateWorld(config.mapSize);
-        this.worldTileData = generator.populateWorld(this.world);
+        this.loaded = false;
+        this.world = [];
+        this.worldTileData = {};
+        const client = new Client(this);
 
         //positional components:
-        this.cameraPos = new VECTOR.Vector2(this.world.length/2,this.world[0].length/2);
+        this.cameraPos = new VECTOR.Vector2(0,0);
         this.selectedTile = new VECTOR.Vector2(0,0);
 
         //zoom init:
@@ -40,6 +41,7 @@ export class Game {
         //scroll zoom
         can.subscribeEventListener('wheel', (e) => {
             e.preventDefault();
+            if (!this.loaded) return;
             this.zoom += e.deltaY/1000*-1;
             if (this.zoom < zoomBounds.x) this.zoom = zoomBounds.x;
             if (this.zoom > zoomBounds.y) this.zoom = zoomBounds.y;
@@ -48,23 +50,27 @@ export class Game {
         //checking if mouse is held over canvas
         can.subscribeEventListener('mousedown', (e) => {
             e.preventDefault();
+            if (!this.loaded) return;
             if (!e.button) keyHandler.keysDown["MouseLeft"] = true;
             if (e.button) keyHandler.keysDown["MouseRight"] = true;
         });
         can.subscribeEventListener('mouseup', (e) => {
             e.preventDefault();
+            if (!this.loaded) return;
             if (!e.button) keyHandler.keysDown["MouseLeft"] = false;
             if (e.button) keyHandler.keysDown["MouseRight"] = false;
         });
         //preventing context menu
         can.subscribeEventListener('contextmenu', (e) => {
             e.preventDefault();
+            if (!this.loaded) return;
         });
 
         
 
         //drawing frames
         const draw = () => {
+            if (!this.loaded) return;
             const zoom = this.zoom;
             const cameraPos = this.cameraPos;
             const selectedTile = this.selectedTile;
@@ -93,6 +99,7 @@ export class Game {
         //camera movement
         let lastMousePos = new VECTOR.Vector2(0,0);
         const cameraPosMoveWithMouse = () => {
+            if (!this.loaded) return;
             if (keyHandler.getKey("MouseLeft")) {
                 
                 this.cameraPos.x += (lastMousePos.x-can.mousePos.x)/can.percentOfCan(this.zoom).y;
@@ -111,6 +118,7 @@ export class Game {
 
         //JSON conversion
         this.convertToJSON = () => {
+            if (!this.loaded) return;
             return JSON.stringify({
                 world: this.world,
                 worldTileData: this.worldTileData,
@@ -130,14 +138,17 @@ export class Game {
 
         //setting tileData
         this.setMetaData = (pos,dataname,data) => {
+            if (!this.loaded) return;
             if (this.worldTileData[pos] == null) this.worldTileData[pos] = {};
             this.worldTileData[pos][dataname] = data;
         }
         this.getMetaData = (pos,dataname) => {
+            if (!this.loaded) return;
             if (this.worldTileData[pos] == null) return null;
             return this.worldTileData[pos][dataname];
         }
         this.checkIfMetaExist = (pos,dataname) => {
+            if (!this.loaded) return;
             if (this.worldTileData[pos] == null) return false;
             return this.worldTileData[pos][dataname] != null;
         }
