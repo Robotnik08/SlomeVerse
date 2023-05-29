@@ -1,4 +1,5 @@
 import { Vector2 } from "./vector.js";
+
 export class Canvas {
     constructor (size) {
         this.can = document.createElement("canvas");

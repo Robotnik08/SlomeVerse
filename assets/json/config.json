@@ -1,0 +1,11 @@
+{
+    "seed": 0,
+    "mapSize": {
+        "x": 400,
+        "y": 400
+    },
+    "smoothness": 0.3,
+    "biomeSmoothness": 0.05,
+    "frequency": 0.61,
+    "forestFrequency": 0.1
+}

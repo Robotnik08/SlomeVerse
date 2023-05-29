@@ -12,7 +12,8 @@ export class SpriteManager {
         }
         this.getTileDataSprites = () => {
             return [
-                new Sprite("assets/img/mountainTile.png")
+                new Sprite("assets/img/mountainTile.png"),
+                new Sprite("assets/img/forestTile.png")
             ];
         }
     }

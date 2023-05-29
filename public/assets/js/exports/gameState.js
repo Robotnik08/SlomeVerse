@@ -1,19 +1,19 @@
-import { getNoise } from "./noise.js";
 import { Time } from "./update.js";
 import { KeyHandler } from "./keyHandler.js";
 import { Colour } from "./colour.js";
 import * as VECTOR from "./vector.js";
 import { SpriteManager } from "./gameSprites.js";
 import { Canvas } from "./canvasHandler.js";
+import { WorldGenerator } from "./generator.js";
 
 export class Game {
-    constructor (size, seed, smoothness, biomeSmoothness, frequency) {
+    constructor (config) {
         //instance of a game, including components and data
 
         //static components:
         const time = new Time();
         const keyHandler = new KeyHandler();
-        const generator = new WorldGenerator(seed, smoothness, biomeSmoothness, frequency);
+        const generator = new WorldGenerator(config);
         const textures = new SpriteManager();
         const can = new Canvas(new VECTOR.Vector2(1280,720));
         const tileSprites = textures.getTileSprites();
@@ -23,7 +23,7 @@ export class Game {
         can.addToDocumentFront();
         
         //world generation:
-        this.world = generator.generateWorld(size);
+        this.world = generator.generateWorld(config.mapSize);
         this.worldTileData = generator.populateWorld(this.world);
 
         //positional components:
@@ -140,40 +140,6 @@ export class Game {
         this.checkIfMetaExist = (pos,dataname) => {
             if (this.worldTileData[pos] == null) return false;
             return this.worldTileData[pos][dataname] != null;
-        }
-    }
-}
-export class WorldGenerator {
-    constructor (seed, smoothness, biomeSmoothness, frequency) {
-        this.generateWorld = (size) => {
-            const w = [];
-            for (let i = 0; i < size.x; i++) {
-                w[i] = [];
-                for (let j = 0; j < size.y; j++) {
-                    w[i][j] = (getNoise(i*smoothness,j*smoothness,seed) > frequency+(8-getNoise(i*smoothness*0.1,j*smoothness*0.1,seed)*16)) ? 0 : this.getBiome(i,j);
-                }
-            }
-            return w;
-        }
-        this.populateWorld = (world) => {
-            const w = {};
-            for (let i = 0; i < world.length; i++) {
-                for (let j = 0; j < world[i].length; j++) {
-                    if (world[i][j] == 0) continue;
-                    if (getNoise(i*smoothness*0.5,j*smoothness*0.5,seed) > 0.73) {
-                        w[new VECTOR.Vector2(i,j)] = {
-                            g: 0
-                        }
-                    }
-                }
-            }
-            return w;
-        }
-        this.getBiome = (x,y) => {
-            const n = getNoise(x*biomeSmoothness,y*biomeSmoothness,seed);
-            if (n < 0.35) return 2;
-            if (n > 0.65) return 3;
-            return 1;
         }
     }
 }
